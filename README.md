@@ -1,5 +1,7 @@
 # friendly-xml-map
 
+## pre-alpha!
+
 Use a schema (prismatic/schema) to transform xml to a friendly Clojure map.
 
 ## Usage
