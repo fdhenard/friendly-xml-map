@@ -59,13 +59,14 @@
                             (let [type-is-vector-of-primitives (is-vector-of-primitives? property-type)]
                               ;; (println (str "type " property-type " is vector of primitives = " type-is-vector-of-primitives))
                               (if type-is-vector-of-primitives
-                                (let [xform (comp
+                                (let [get-single-value-content (fn [x]
+                                                                 (let [content (:content x)]
+                                                                   (if (not= 1 (count content))
+                                                                     (throw (Exception. "expected exactly 1"))
+                                                                     (first content))))
+                                      xform (comp
                                              (filter #(= property-key (get % :tag)))
-                                             (map (fn [x]
-                                                    (let [content (:content x)]
-                                                      (if (not= 1 (count content))
-                                                        (throw (Exception. "expected exactly 1"))
-                                                        (first content))))))]
+                                             (map get-single-value-content))]
                                   [property-key (into [] xform (get xml-map :content))])
                                 ;; TODO look for the vector in the content
                                 ))))
