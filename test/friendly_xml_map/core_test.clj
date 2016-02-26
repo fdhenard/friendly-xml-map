@@ -29,7 +29,16 @@
         the-xml "<what attr-one=\"who\"><attr-two>one</attr-two><attr-two>two</attr-two></what>"
         xml-map (parse-str the-xml)
         friendly-map (friendly-map xml-map What)]
-    (println (format "xml-map = %s" (with-out-str (pp/pprint xml-map))))
-    (println (format "friendly-map = %s" (with-out-str (pp/pprint friendly-map))))
+    ;; (println (format "xml-map = %s" (with-out-str (pp/pprint xml-map))))
+    ;; (println (format "friendly-map = %s" (with-out-str (pp/pprint friendly-map))))
     (is (map-is-same? friendly-map {:attr-one "who"
                                     :attr-two ["one", "two"]}))))
+
+
+;; (deftest type-with-single-type
+;;   (let [TypeChild {:one s/Str}
+;;         TypeParent {:a TypeChild}
+;;         the-xml "<TypeParent><a><TypeChild one=\"test\" /></a></TypeParent>"
+;;         xml-map (parse-str the-xml)
+;;         friendly-map (friendly-map xml-map TypeParent)]
+;;     (is (map-is-same? friendly-map {:a {:one "test"}}))))

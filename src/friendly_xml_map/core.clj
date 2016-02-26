@@ -38,7 +38,7 @@
         (if property-is-in-attrs
           [property-key (get (:attrs xml-map) property-key)]
           (let [single-content-matches (->> (get xml-map :content) ;; assuming single primitive content
-                                        (filter #(= property-key (get % :tag))))]
+                                            (filter #(= property-key (get % :tag))))]
             (if (not= 1 (count single-content-matches))
               (throw (Exception. "expecting exactly 1"))
               (let [val (-> single-content-matches first :content first)]
