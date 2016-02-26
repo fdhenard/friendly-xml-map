@@ -35,18 +35,28 @@
       (println (str "analy map = " (with-out-str (pp/pprint analysis-map)))))
     (cond
       (is-primitive? property-type)
-      (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)]
-        (cond
-          is-property-in-attrs
+      (let [property-is-in-attrs (contains? (:attrs xml-map) property-key)]
+        (if property-is-in-attrs
           [property-key (get (:attrs xml-map) property-key)]
-
-          :default ;; expecting single value content
           (let [single-content-matches (->> (get xml-map :content)
                                         (filter #(= property-key (get % :tag))))]
             (if (not= 1 (count single-content-matches))
               (throw (Exception. "expecting exactly 1"))
               (let [val (-> single-content-matches first :content first)]
-                [property-key val])))))
+                [property-key val]))))
+        
+        ;; (cond
+        ;;   property-is-in-attrs
+        ;;   [property-key (get (:attrs xml-map) property-key)]
+
+        ;;   :default ;; expecting single value content
+        ;;   (let [single-content-matches (->> (get xml-map :content)
+        ;;                                 (filter #(= property-key (get % :tag))))]
+        ;;     (if (not= 1 (count single-content-matches))
+        ;;       (throw (Exception. "expecting exactly 1"))
+        ;;       (let [val (-> single-content-matches first :content first)]
+        ;;         [property-key val]))))
+        )
       
       (is-vector-of-primitives? property-type)
       (let [get-primitive-content (fn [x]
