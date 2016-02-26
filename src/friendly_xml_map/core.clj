@@ -17,25 +17,6 @@
 (defn parse-str [xml-str]
   (xml/parse (java.io.ByteArrayInputStream. (.getBytes xml-str))))
 
-
-(defn friendly-map [xml-map schema]
-  (let [valid-attrs (filter #(and (contains? schema (first %)) ;; is the attr in the schema?
-                                  true ;; also validate type?
-                                  )
-                            (:attrs xml-map))
-        content-filter-func (fn [x]
-                              (println "x = " x)
-                              (and (map? x)
-                                   (contains? schema (:tag x)) ;; is the tag in the schema?
-                                   (= 1 (count (:content x)))))
-        convert-content-to-key-val (fn [content-map]
-                                     [(:tag content-map) (-> content-map :content first)])
-        valid-content-xf (comp
-                          (filter content-filter-func)
-                          (map convert-content-to-key-val))
-        valid-content (into [] valid-content-xf (:content xml-map))]
-    (into {} (concat valid-attrs valid-content))))
-
 (defn- is-primitive? [property-type]
   ;; (println (str "type of property-type = " (type property-type)))
   (and (= java.lang.Class (type property-type))
@@ -81,6 +62,6 @@
       )))
 
 
-(defn friendly-map-two [xml-map schema]
+(defn friendly-map [xml-map schema]
   (let [key-val-vector (map (get-key-value-from-xml-map xml-map) schema)]
     (into {} key-val-vector)))
