@@ -29,7 +29,7 @@
 
 (defn- get-key-value-from-xml-map [xml-map]
   (fn [[property-key property-type]]
-    (println (str "analy map = " (with-out-str (pp/pprint {:property-key property-key
+    (println (str "debug map = " (with-out-str (pp/pprint {:property-key property-key
                                                            :property-type property-type
                                                            :attrs-of-map (:attrs xml-map)}))))
     (cond
