@@ -33,9 +33,6 @@
         valid-content-xf (comp
                           (filter content-filter-func)
                           (map convert-content-to-key-val))
-        ;; valid-content (->> (:content xml-map)
-        ;;                    (filter content-filter-func)
-        ;;                    (map convert-content-to-key-val))
         valid-content (into [] valid-content-xf (:content xml-map))]
     (into {} (concat valid-attrs valid-content))))
 
@@ -57,10 +54,7 @@
       (println (str "analy map = " (with-out-str (pp/pprint analysis-map)))))
     (cond
       (is-primitive? property-type)
-      (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)
-            ;; find-single-value-content (comp
-            ;;                            (filter #(= property-key (get % :tag))))
-            ]
+      (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)]
         (cond
           is-property-in-attrs
           [property-key (get (:attrs xml-map) property-key)]
