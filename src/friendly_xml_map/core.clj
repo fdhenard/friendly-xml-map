@@ -40,7 +40,9 @@
     (into {} (concat valid-attrs valid-content))))
 
 (defn- is-primitive? [property-type]
-  (contains? #{"java.lang.String" "java.lang.Long" "clojure.lang.Keyword"} (.getName property-type)))
+  ;; (println (str "type of property-type = " (type property-type)))
+  (and (= java.lang.Class (type property-type))
+       (contains? #{"java.lang.String" "java.lang.Long" "clojure.lang.Keyword"} (.getName property-type))))
 
 (defn- is-vector-of-primitives? [x]
   (and (sequential? x)
@@ -53,21 +55,35 @@
                      :property-type property-type
                      :attrs-of-map (:attrs xml-map)}]
       (println (str "analy map = " (with-out-str (pp/pprint analy-map)))))
-    (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)]
-      (cond
-        is-property-in-attrs
-        [property-key (get (:attrs xml-map) property-key)]
-        
-        (is-vector-of-primitives? property-type)
-        (let [get-single-value-content (fn [x]
-                                             (let [content (:content x)]
-                                               (if (not= 1 (count content))
-                                                 (throw (Exception. "expected exactly 1"))
-                                                 (first content))))
-                  xform-vector-of-primitives (comp
-                                              (filter #(= property-key (get % :tag)))
-                                              (map get-single-value-content))]
-              [property-key (into [] xform-vector-of-primitives (get xml-map :content))]))
+    (cond
+      (is-primitive? property-type)
+      (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)
+            ;; find-single-value-content (comp
+            ;;                            (filter #(= property-key (get % :tag))))
+            ]
+        (cond
+          is-property-in-attrs
+          [property-key (get (:attrs xml-map) property-key)]
+
+          :default ;; expecting single value content
+          (let [single-content-matches (->> (get xml-map :content)
+                                        (filter #(= property-key (get % :tag))))]
+            (if (not= 1 (count single-content-matches))
+              (throw (Exception. "expecting exactly 1"))
+              (let [val (-> single-content-matches first :content first)]
+                [property-key val])))))
+      
+      (is-vector-of-primitives? property-type)
+      (let [get-primitive-content (fn [x]
+                                       (let [content (:content x)]
+                                         (if (not= 1 (count content))
+                                           (throw (Exception. "expected exactly 1"))
+                                           (first content))))
+            xform-vector-of-primitives (comp
+                                        (filter #(= property-key (get % :tag)))
+                                        (map get-primitive-content))]
+        [property-key (into [] xform-vector-of-primitives (get xml-map :content))])
+
       )))
 
 
