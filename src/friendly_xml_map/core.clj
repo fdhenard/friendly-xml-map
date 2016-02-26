@@ -65,10 +65,8 @@
                                                                      (throw (Exception. "expected exactly 1"))
                                                                      (first content))))
                                       xform-vector-of-primitives (comp
-                                             (filter #(= property-key (get % :tag)))
-                                             (map get-single-value-content))]
-                                  [property-key (into [] xform-vector-of-primitives (get xml-map :content))])
-                                ;; TODO look for the vector in the content
-                                ))))
+                                                                  (filter #(= property-key (get % :tag)))
+                                                                  (map get-single-value-content))]
+                                  [property-key (into [] xform-vector-of-primitives (get xml-map :content))])))))
         key-val-vector (map conversion-func schema)]
     (into {} key-val-vector)))
