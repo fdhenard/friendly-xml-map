@@ -39,14 +39,35 @@
         valid-content (into [] valid-content-xf (:content xml-map))]
     (into {} (concat valid-attrs valid-content))))
 
+(defn- is-primitive? [property-type]
+  (contains? #{"java.lang.String" "java.lang.Long" "clojure.lang.Keyword"} (.getName property-type)))
+
+(defn- is-vector-of-primitives? [x]
+  (and (sequential? x)
+       (= 1 (count x))
+       (is-primitive? (first x))))
+
 
 (defn friendly-map-two [xml-map schema]
-  (let [conversion-func (fn [[attr-id attr-value]]
-                          (let [analy-map {:attr-id attr-id
-                                           :attr-value attr-value
+  (let [conversion-func (fn [[property-key property-type]]
+                          (let [analy-map {:property-key property-key
+                                           :property-type property-type
                                            :attrs-of-map (:attrs xml-map)}]
                             (println (str "analy map = " (with-out-str (pp/pprint analy-map)))))
-                          (if (contains? (:attrs xml-map) attr-id) ;; should also check type?
-                            [attr-id (get (:attrs xml-map) attr-id)]))
+                          (if (contains? (:attrs xml-map) property-key) ;; should also check type?
+                            [property-key (get (:attrs xml-map) property-key)]
+                            (let [type-is-vector-of-primitives (is-vector-of-primitives? property-type)]
+                              ;; (println (str "type " property-type " is vector of primitives = " type-is-vector-of-primitives))
+                              (if type-is-vector-of-primitives
+                                (let [xform (comp
+                                             (filter #(= property-key (get % :tag)))
+                                             (map (fn [x]
+                                                    (let [content (:content x)]
+                                                      (if (not= 1 (count content))
+                                                        (throw (Exception. "expected exactly 1"))
+                                                        (first content))))))]
+                                  [property-key (into [] xform (get xml-map :content))])
+                                ;; TODO look for the vector in the content
+                                ))))
         key-val-vector (map conversion-func schema)]
     (into {} key-val-vector)))
