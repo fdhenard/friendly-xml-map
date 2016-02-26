@@ -35,10 +35,10 @@
                                     :attr-two ["one", "two"]}))))
 
 
-;; (deftest type-with-single-type
-;;   (let [TypeChild {:one s/Str}
-;;         TypeParent {:a TypeChild}
-;;         the-xml "<TypeParent><a><TypeChild one=\"test\" /></a></TypeParent>"
-;;         xml-map (parse-str the-xml)
-;;         friendly-map (friendly-map xml-map TypeParent)]
-;;     (is (map-is-same? friendly-map {:a {:one "test"}}))))
+(deftest type-with-single-type
+  (let [TypeChild {:one s/Str}
+        TypeParent {:a TypeChild}
+        the-xml "<TypeParent><a><TypeChild one=\"test\" /></a></TypeParent>"
+        xml-map (parse-str the-xml)
+        friendly-map (friendly-map xml-map TypeParent)]
+    (is (map-is-same? friendly-map {:a {:one "test"}}))))

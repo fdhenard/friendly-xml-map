@@ -31,7 +31,9 @@
   (fn [[property-key property-type]]
     (println (str "debug map = " (with-out-str (pp/pprint {:property-key property-key
                                                            :property-type property-type
-                                                           :attrs-of-map (:attrs xml-map)}))))
+                                                           :attrs-of-map (:attrs xml-map)
+                                                           :is-map (map? property-type)
+                                                           :xml-map xml-map}))))
     (cond
       (is-primitive? property-type)
       (let [property-is-in-attrs (contains? (:attrs xml-map) property-key)]
@@ -55,9 +57,15 @@
                                         (map get-primitive-content))]
         [property-key (into [] xform-vector-of-primitives (get xml-map :content))])
 
+      (map? property-type)
+      [property-key (friendly-map (-> xml-map :content first :content first) property-type)]
       )))
 
 
 (defn friendly-map [xml-map schema]
   (let [key-val-vector (map (get-key-value-from-xml-map xml-map) schema)]
     (into {} key-val-vector)))
+
+
+(defn friendly-map-postwalk [xml-map schema]
+  (let [walk-fn (fn [x])]))
