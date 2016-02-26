@@ -51,10 +51,10 @@
 
 (defn- get-key-value-from-xml-map [xml-map]
   (fn [[property-key property-type]]
-    (let [analy-map {:property-key property-key
+    (let [analysis-map {:property-key property-key
                      :property-type property-type
                      :attrs-of-map (:attrs xml-map)}]
-      (println (str "analy map = " (with-out-str (pp/pprint analy-map)))))
+      (println (str "analy map = " (with-out-str (pp/pprint analysis-map)))))
     (cond
       (is-primitive? property-type)
       (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)
