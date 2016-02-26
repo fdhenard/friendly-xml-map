@@ -53,20 +53,22 @@
                      :property-type property-type
                      :attrs-of-map (:attrs xml-map)}]
       (println (str "analy map = " (with-out-str (pp/pprint analy-map)))))
-    (if (contains? (:attrs xml-map) property-key) ;; should also check type?
-      [property-key (get (:attrs xml-map) property-key)]
-      (let [type-is-vector-of-primitives (is-vector-of-primitives? property-type)]
-        ;; (println (str "type " property-type " is vector of primitives = " type-is-vector-of-primitives))
-        (if type-is-vector-of-primitives
-          (let [get-single-value-content (fn [x]
-                                           (let [content (:content x)]
-                                             (if (not= 1 (count content))
-                                               (throw (Exception. "expected exactly 1"))
-                                               (first content))))
-                xform-vector-of-primitives (comp
-                                            (filter #(= property-key (get % :tag)))
-                                            (map get-single-value-content))]
-            [property-key (into [] xform-vector-of-primitives (get xml-map :content))]))))))
+    (let [is-property-in-attrs (contains? (:attrs xml-map) property-key)]
+      (cond
+        is-property-in-attrs
+        [property-key (get (:attrs xml-map) property-key)]
+        
+        (is-vector-of-primitives? property-type)
+        (let [get-single-value-content (fn [x]
+                                             (let [content (:content x)]
+                                               (if (not= 1 (count content))
+                                                 (throw (Exception. "expected exactly 1"))
+                                                 (first content))))
+                  xform-vector-of-primitives (comp
+                                              (filter #(= property-key (get % :tag)))
+                                              (map get-single-value-content))]
+              [property-key (into [] xform-vector-of-primitives (get xml-map :content))]))
+      )))
 
 
 (defn friendly-map-two [xml-map schema]
