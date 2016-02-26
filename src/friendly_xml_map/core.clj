@@ -42,7 +42,7 @@
 (defn- is-primitive? [property-type]
   ;; (println (str "type of property-type = " (type property-type)))
   (and (= java.lang.Class (type property-type))
-       (contains? #{"java.lang.String" "java.lang.Long" "clojure.lang.Keyword"} (.getName property-type))))
+       (contains? #{java.lang.String java.lang.Long clojure.lang.Keyword} property-type)))
 
 (defn- is-vector-of-primitives? [x]
   (and (sequential? x)
